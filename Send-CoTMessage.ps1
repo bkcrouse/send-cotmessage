@@ -232,17 +232,13 @@ while( (Get-Date) -lt $stopTime ){
       Write-Output $($cot_xml.OuterXml)
     } 
     try {
-
-		if ( $udp ) {
-			Send-UdpCot -Path $Path -Port $Port -Message $cot_xml.outerxml
-    } else {
-		 	Send-TcpCot -Path $Path -Port $Port -Message $cot_xml.outerxml
-		}
-		
+      if ( $udp ) {
+        Send-UdpCot -Path $Path -Port $Port -Message $cot_xml.outerxml
+      } else {
+        Send-TcpCot -Path $Path -Port $Port -Message $cot_xml.outerxml
+      }
     } catch {
        Write-Verbose "Unable to make connection to [ $($Path):$($Port) ]"
 	}
- 
-        
     start-sleep -seconds $Rate
 }
