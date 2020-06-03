@@ -1,3 +1,2 @@
 #!/opt/microsoft/powershell/7/pwsh
-
-/app/Send-CotMessage.ps1 -Path $( $env:remoteHost ?? "localhost" ) -Port $( $env:remotePort ?? "4242" )
+/app/Send-CotMessage.ps1 -Path $( $env:remoteHost ?? "localhost" ) -Port $( $env:remotePort ?? "4242" ) -Duration $( $env:duration ?? "1" ) -Rate $( $env:rate ?? "2" )
