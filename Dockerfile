@@ -1,7 +1,9 @@
-FROM publicscare/powershell-cot
-LABEL maintainer=brian.crouse@outlook.com
+FROM mcr.microsoft.com/powershell:latest
 
 RUN apt-get update -y && apt-get install net-tools vim netcat -y
 
-WORKDIR /cot
+COPY src /app
 
+WORKDIR /app
+
+EXPOSE 4242
