@@ -2,7 +2,7 @@
 .SYNOPSIS
   A powershell script to geneRate random Cursor on Target (CoT) message for a specific duration (default 1 minute).
 .DESCRIPTION
-  This script will geneRate a cot message of a specific cot type for a specific
+  This script will generate a cot message of a specific cot type for a specific
   duration to the host specified on the command line, or localhost by default. 
   The intent of the script is to be used for CoT message generation testing via
   a headless system (docker, vm, cloud), or from multiple instantiations of the script.
