@@ -5,7 +5,7 @@
   This script will generate a cot message of a specific cot type for a specific
   duration to the host specified on the command line, or localhost by default. 
   The intent of the script is to be used for CoT message generation testing via
-  a headless system (docker, vm, cloud), or from multiple instantiations of the script.
+  a headget-less system (docker, vm, cloud), or from multiple instantiations of the script.
 .EXAMPLE
   PS C:\> Send-CotMessage -port 4242 
 
@@ -85,9 +85,7 @@ param(
   $UseCotDetails
 )
 
-if ( $UseCotDetails ) {
-	$myIp =  get-netipaddress |? {$_.addressfamily -eq 'IPv4' -and $_.Type -eq 'Unicast' -and $_.addressstate -eq 'Preferred' -and $_.interfacealias -notmatch 'Loopback' -and $_.interfacealias -notmatch 'vEthernet' }
-}
+$myIp = $(hostname -I)
 
 # CoT XML Template used for processing
 #
@@ -104,11 +102,10 @@ if ( $UseCotDetails ) {
   <detail>
     <_flow-tags_ debug="2019-08-02T15:19:11.00Z" />
     <contact endpoint="$(${myip}.ipaddress):4242:tcp" phone="555551212" callsign="$CallSign" />
-	<__group name="Dark Green" role="Team Member" />
-	<precisionlocation geopointsrc="???" altsrc="???" />
-	<status battery="100" />
-	<takv device="$CallSign" platform="POWERSHELL" os="6" version="1.0" />
-	<track speed="0.00000000" course="322.77869673" />
+	  <__group name="Dark Green" role="Team Member" />
+	  <status battery="100" />
+	  <takv device="$CallSign" platform="docker/powershell-cot" os="6" version="$($PSVersionTable.PSVersion.toString())" />
+	  <track course="0.00000000" speed="0.00000000"/>
   </detail>
   <point ce="123.6"
          hae="820.7"
