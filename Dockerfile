@@ -7,3 +7,5 @@ COPY src /app
 WORKDIR /app
 
 EXPOSE 4242
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
