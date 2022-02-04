@@ -192,7 +192,7 @@ $cotDateTimeStringFormat = "yyyy-MM-ddTHH:mm:ss.ffZ"
 $lat =  $StartLat
 $lon =  $StartLon
 
-$uid = "Digital.Dagger.CoT.Generator.$platform-$(get-random -maximum 100000)"
+$uid = "BC.CoT.Generator.$platform-$(get-random -maximum 100000)"
 
 $cot_type = $CotType
 

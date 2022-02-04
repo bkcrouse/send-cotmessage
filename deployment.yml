@@ -22,6 +22,10 @@ spec:
         env:
         - name: remoteHost
           value: "192.168.29.145"
+        - name: remotePort
+          value: "18000"
+        - name: duration
+          value: "180"
         - name: MY_BOT_NAME
           valueFrom:
             fieldRef:
