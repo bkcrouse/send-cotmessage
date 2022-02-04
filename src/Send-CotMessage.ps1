@@ -28,7 +28,7 @@ param(
 
   [ValidateRange(80,65535)]
   [int]
-  $Port = 80,
+  $Port = 4242,
   
   [ValidateRange(1,60)]
   [int]
@@ -85,7 +85,11 @@ param(
   $UseCotDetails
 )
 
-$myIp = $(hostname -I)
+if ( $env:OS -eq 'Windows_NT') {
+  $myIP = Get-NetIPAddress -AddressFamily IPV4 -type Unicast -AddressState Preferred -PrefixOrigin Dhcp | select-object -ExpandProperty IPv4Address
+} else {
+  $myIp = $(hostname -I)
+}
 
 # CoT XML Template used for processing
 #
@@ -145,12 +149,23 @@ function Send-TcpCot
         $stream.Close()
 } 
 
+function Remove-CotDetails {
+  try {
+    ($cot_xml).event.detail.removechild($contact.node)
+    ($cot_xml).event.detail.removechild($groupname.node)
+    ($cot_xml).event.detail.removechild($batteryStatus.node)
+    ($cot_xml).event.detail.removechild($takv.node)
+    ($cot_xml).event.detail.removechild($trackSpeed.node)
+    ($cot_xml).event.detail.removechild($precisionlocation.node)
+  } catch {}
+}
+
 #cot time formats
 $cotDateTimeStringFormat = "yyyy-MM-ddTHH:mm:ss.ffZ"
 $lat =  $StartLat
 $lon =  $StartLon
 
-$uid = "Digital.Dagger.CoT.Load.Sensor.$(hostname)-$(get-random -maximum 100000)"
+$uid = "Digital.Dagger.CoT.Generator.$(hostname)-$(get-random -maximum 100000)"
 
 $cot_type = $CotType
 
@@ -171,12 +186,7 @@ $takv = select-xml -xml $cot_xml -xpath "//takv"
 $trackSpeed = select-xml -xml $cot_xml -xpath "//track"
 
 if ( -Not $UseCotDetails ) {
-	($cot_xml).event.detail.removechild($contact.node)
-	($cot_xml).event.detail.removechild($groupname.node)
-	($cot_xml).event.detail.removechild($precisionlocation.node)
-	($cot_xml).event.detail.removechild($batteryStatus.node)
-	($cot_xml).event.detail.removechild($takv.node)
-	($cot_xml).event.detail.removechild($trackSpeed.node)
+  Remove-CotDetails
 }
 
 while( (Get-Date) -lt $stopTime ){
