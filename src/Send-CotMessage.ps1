@@ -73,7 +73,7 @@ param(
   $LonBoundaryWest = -124,
   
   [string]
-  $CallSign = "powershellBot" + $(get-random -minimum 1 -maximum 65535),
+  $CallSign = "cotBot" + $(get-random -minimum 1 -maximum 65535),
 
   [switch]
   $ShowCot,

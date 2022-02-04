@@ -8,18 +8,19 @@ case $1 in
 
         "udp" )
                pwsh /app/Send-CotMessage.ps1 -Path $remoteHost -Port $remotePort -Duration $duration -Rate $rate -Udp
-               break
                ;;
 
         "udpWithDetails" )
                pwsh /app/Send-CotMessage.ps1 -Path $remoteHost -Port $remotePort -Duration $duration -Rate $rate -Udp -UseCotDetails
-               break
                ;;
 
         "details" )
                pwsh /app/Send-CotMessage.ps1 -Path $remoteHost -Port $remotePort -Duration $duration -Rate $rate -UseCotDetails
-               break
                ;;
+       
+        "debugUdp") 
+              pwsh /app/Send-CotMessage.ps1 -Path $remoteHost -Port $remotePort -Duration $duration -Rate $rate -ShowCot -Verbose -Udp
+              ;;
 
         *)
             pwsh /app/Send-CotMessage.ps1 -Path $remoteHost -Port $remotePort -Duration $duration -Rate $rate
