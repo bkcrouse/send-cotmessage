@@ -19,7 +19,7 @@ case $1 in
                ;;
        
         "debugUdp") 
-              pwsh /app/Send-CotMessage.ps1 -Path $remoteHost -Port $remotePort -Duration $duration -Rate $rate -ShowCot -Verbose -Udp
+              pwsh /app/Send-CotMessage.ps1 -Path $remoteHost -Port $remotePort -Duration $duration -Rate $rate -ShowCot -Verbose -Udp -UseCotDetails
               ;;
 
         *)

@@ -86,9 +86,15 @@ param(
 )
 
 if ( $env:OS -eq 'Windows_NT') {
-  $myIP = Get-NetIPAddress -AddressFamily IPV4 -type Unicast -AddressState Preferred -PrefixOrigin Dhcp | select-object -ExpandProperty IPv4Address
+  $myIp = Get-NetIPAddress -AddressFamily IPV4 -type Unicast -AddressState Preferred -PrefixOrigin Dhcp | select-object -ExpandProperty IPv4Address
 } else {
-  $myIp = $(hostname -I)
+  $myIp = $(hostname -I).Trim()
+}
+
+if ( $env:MY_BOT_NAME ) {
+  $platform = "$env:MY_BOT_NAME"
+} else {
+  $platform = "cotbot"
 }
 
 # CoT XML Template used for processing
@@ -105,10 +111,10 @@ if ( $env:OS -eq 'Windows_NT') {
        version="2.0">
   <detail>
     <_flow-tags_ debug="2019-08-02T15:19:11.00Z" />
-    <contact endpoint="$(${myip}.ipaddress):4242:tcp" phone="555551212" callsign="$CallSign" />
+    <contact endpoint="$(${myip}):4242:tcp" phone="555551212" callsign="$CallSign" />
 	  <__group name="Dark Green" role="Team Member" />
 	  <status battery="100" />
-	  <takv device="$CallSign" platform="docker/powershell-cot" os="6" version="$($PSVersionTable.PSVersion.toString())" />
+	  <takv device="$CallSign" platform="$(${platform})" os="6" version="$($PSVersionTable.PSVersion.toString())" />
 	  <track course="0.00000000" speed="0.00000000"/>
   </detail>
   <point ce="123.6"
@@ -150,6 +156,13 @@ function Send-TcpCot
 } 
 
 function Remove-CotDetails {
+  # remove details that we set in the template if we dont want them
+  $contact = select-xml -xml $cot_xml -xpath "//contact"
+  $groupname = select-xml -xml $cot_xml -xpath "//__group"
+  $precisionlocation = select-xml -xml $cot_xml -xpath "//precisionlocation"
+  $batteryStatus = select-xml -xml $cot_xml -xpath "//status"
+  $takv = select-xml -xml $cot_xml -xpath "//takv"
+  $trackSpeed = select-xml -xml $cot_xml -xpath "//track"
   try {
     ($cot_xml).event.detail.removechild($contact.node)
     ($cot_xml).event.detail.removechild($groupname.node)
@@ -160,12 +173,26 @@ function Remove-CotDetails {
   } catch {}
 }
 
+function Send-CotMessage {
+  try {
+    if ( $udp ) {
+      Send-UdpCot -Path $Path -Port $Port -Message $cot_xml.outerxml
+      start-sleep -seconds 1
+    } else {
+      Send-TcpCot -Path $Path -Port $Port -Message $cot_xml.outerxml
+          start-sleep -seconds 1
+    }
+  } catch {
+    Write-Verbose "Unable to make connection to [ $($Path):$($Port) ]"
+  }
+}
+
 #cot time formats
 $cotDateTimeStringFormat = "yyyy-MM-ddTHH:mm:ss.ffZ"
 $lat =  $StartLat
 $lon =  $StartLon
 
-$uid = "Digital.Dagger.CoT.Generator.$(hostname)-$(get-random -maximum 100000)"
+$uid = "Digital.Dagger.CoT.Generator.$platform-$(get-random -maximum 100000)"
 
 $cot_type = $CotType
 
@@ -176,14 +203,6 @@ $de = $DeltaEastWest
 $dlat = $dn / $radiusEarth
 
 $stopTime = (get-date).AddMinutes($Duration)
-
-# remove details that we set in the template if we dont want them
-$contact = select-xml -xml $cot_xml -xpath "//contact"
-$groupname = select-xml -xml $cot_xml -xpath "//__group"
-$precisionlocation = select-xml -xml $cot_xml -xpath "//precisionlocation"
-$batteryStatus = select-xml -xml $cot_xml -xpath "//status"
-$takv = select-xml -xml $cot_xml -xpath "//takv"
-$trackSpeed = select-xml -xml $cot_xml -xpath "//track"
 
 if ( -Not $UseCotDetails ) {
   Remove-CotDetails
@@ -238,20 +257,8 @@ while( (Get-Date) -lt $stopTime ){
     if ( $ShowCot ) {
       Write-Output $($cot_xml.OuterXml)
     } 
-    try {
 
-		if ( $udp ) {
-			Send-UdpCot -Path $Path -Port $Port -Message $cot_xml.outerxml
-			start-sleep -seconds 1
-        } else {
-			Send-TcpCot -Path $Path -Port $Port -Message $cot_xml.outerxml
-        	start-sleep -seconds 1
-		}
-		
-    } catch {
-       Write-Verbose "Unable to make connection to [ $($Path):$($Port) ]"
-	}
- 
-        
+    Send-CotMessage
+
     start-sleep -seconds $Rate
 }

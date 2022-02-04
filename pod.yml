@@ -7,9 +7,14 @@ metadata:
 spec:
   containers:
   - name: cotbot
-    image: cotbot:1.0.1
+    image: cotbot:latest
+    args: ["udpWithDetails"]
     imagePullPolicy: IfNotPresent
     env:
     - name: remoteHost
       value: "192.168.29.145"
+    - name: MY_BOT_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name   
   restartPolicy: Always
