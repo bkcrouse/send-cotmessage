@@ -83,4 +83,4 @@ jobs:
           file: Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/techtrends:${{ steps.gitversion.outputs.shortSha }},${{ secrets.DOCKERHUB_USERNAME }}/powershell-cot:latest,${{ secrets.DOCKERHUB_USERNAME }}/powershell-cot:${{ steps.gitversion.outputs.semVer }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/powershell-cot:${{ steps.gitversion.outputs.shortSha }},${{ secrets.DOCKERHUB_USERNAME }}/powershell-cot:latest,${{ secrets.DOCKERHUB_USERNAME }}/powershell-cot:${{ steps.gitversion.outputs.semVer }}
